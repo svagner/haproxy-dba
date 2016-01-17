@@ -3033,6 +3033,7 @@ int cfg_parse_listen(const char *file, int linenum, char **args, int kwm)
 		if (!strcmp(args[1], "http")) curproxy->mode = PR_MODE_HTTP;
 		else if (!strcmp(args[1], "tcp")) curproxy->mode = PR_MODE_TCP;
 		else if (!strcmp(args[1], "health")) curproxy->mode = PR_MODE_HEALTH;
+		else if (!strcmp(args[1], "mysqlproxy")) curproxy->mode = PR_MODE_MYSQL;
 		else {
 			Alert("parsing [%s:%d] : unknown proxy mode '%s'.\n", file, linenum, args[1]);
 			err_code |= ERR_ALERT | ERR_FATAL;
@@ -4189,7 +4190,7 @@ int cfg_parse_listen(const char *file, int linenum, char **args, int kwm)
 				goto out;
 			}
 
-			if (!stats_check_init_uri_auth(&curproxy->uri_auth)) {
+			if (!check_init_uri_auth(&curproxy->uri_auth, STATS_DEFAULT_URI)) {
 				Alert("parsing [%s:%d]: out of memory.\n", file, linenum);
 				err_code |= ERR_ALERT | ERR_ABORT;
 				goto out;
@@ -4221,7 +4222,7 @@ int cfg_parse_listen(const char *file, int linenum, char **args, int kwm)
 				Alert("parsing [%s:%d] : 'uri' needs an URI prefix.\n", file, linenum);
 				err_code |= ERR_ALERT | ERR_FATAL;
 				goto out;
-			} else if (!stats_set_uri(&curproxy->uri_auth, args[2])) {
+			} else if (!http_set_uri(&curproxy->uri_auth, args[2], STATS_DEFAULT_URI)) {
 				Alert("parsing [%s:%d] : out of memory.\n", file, linenum);
 				err_code |= ERR_ALERT | ERR_ABORT;
 				goto out;
@@ -4231,7 +4232,7 @@ int cfg_parse_listen(const char *file, int linenum, char **args, int kwm)
 				Alert("parsing [%s:%d] : 'realm' needs an realm name.\n", file, linenum);
 				err_code |= ERR_ALERT | ERR_FATAL;
 				goto out;
-			} else if (!stats_set_realm(&curproxy->uri_auth, args[2])) {
+			} else if (!http_set_realm(&curproxy->uri_auth, args[2], STATS_DEFAULT_URI)) {
 				Alert("parsing [%s:%d] : out of memory.\n", file, linenum);
 				err_code |= ERR_ALERT | ERR_ABORT;
 				goto out;
@@ -4245,7 +4246,7 @@ int cfg_parse_listen(const char *file, int linenum, char **args, int kwm)
 				      file, linenum, *err);
 				err_code |= ERR_ALERT | ERR_FATAL;
 				goto out;
-			} else if (!stats_set_refresh(&curproxy->uri_auth, interval)) {
+			} else if (!http_set_refresh(&curproxy->uri_auth, interval, STATS_DEFAULT_URI)) {
 				Alert("parsing [%s:%d] : out of memory.\n", file, linenum);
 				err_code |= ERR_ALERT | ERR_ABORT;
 				goto out;
@@ -4259,7 +4260,7 @@ int cfg_parse_listen(const char *file, int linenum, char **args, int kwm)
 				goto out;
 			}
 
-			if (!stats_check_init_uri_auth(&curproxy->uri_auth)) {
+			if (!check_init_uri_auth(&curproxy->uri_auth, STATS_DEFAULT_URI)) {
 				Alert("parsing [%s:%d]: out of memory.\n", file, linenum);
 				err_code |= ERR_ALERT | ERR_ABORT;
 				goto out;
@@ -4289,7 +4290,7 @@ int cfg_parse_listen(const char *file, int linenum, char **args, int kwm)
 				Alert("parsing [%s:%d] : 'auth' needs a user:password account.\n", file, linenum);
 				err_code |= ERR_ALERT | ERR_FATAL;
 				goto out;
-			} else if (!stats_add_auth(&curproxy->uri_auth, args[2])) {
+			} else if (!uri_add_auth(&curproxy->uri_auth, args[2], STATS_DEFAULT_URI)) {
 				Alert("parsing [%s:%d] : out of memory.\n", file, linenum);
 				err_code |= ERR_ALERT | ERR_ABORT;
 				goto out;
@@ -4299,25 +4300,25 @@ int cfg_parse_listen(const char *file, int linenum, char **args, int kwm)
 				Alert("parsing [%s:%d] : 'scope' needs a proxy name.\n", file, linenum);
 				err_code |= ERR_ALERT | ERR_FATAL;
 				goto out;
-			} else if (!stats_add_scope(&curproxy->uri_auth, args[2])) {
+			} else if (!uri_add_scope(&curproxy->uri_auth, args[2], STATS_DEFAULT_URI)) {
 				Alert("parsing [%s:%d] : out of memory.\n", file, linenum);
 				err_code |= ERR_ALERT | ERR_ABORT;
 				goto out;
 			}
 		} else if (!strcmp(args[1], "enable")) {
-			if (!stats_check_init_uri_auth(&curproxy->uri_auth)) {
+			if (!check_init_uri_auth(&curproxy->uri_auth, STATS_DEFAULT_URI)) {
 				Alert("parsing [%s:%d] : out of memory.\n", file, linenum);
 				err_code |= ERR_ALERT | ERR_ABORT;
 				goto out;
 			}
 		} else if (!strcmp(args[1], "hide-version")) {
-			if (!stats_set_flag(&curproxy->uri_auth, ST_HIDEVER)) {
+			if (!uri_set_flag(&curproxy->uri_auth, STATS_DEFAULT_URI, ST_HIDEVER)) {
 				Alert("parsing [%s:%d] : out of memory.\n", file, linenum);
 				err_code |= ERR_ALERT | ERR_ABORT;
 				goto out;
 			}
 		} else if (!strcmp(args[1], "show-legends")) {
-			if (!stats_set_flag(&curproxy->uri_auth, ST_SHLGNDS)) {
+			if (!uri_set_flag(&curproxy->uri_auth, STATS_DEFAULT_URI, ST_SHLGNDS)) {
 				Alert("parsing [%s:%d]: out of memory.\n", file, linenum);
 				err_code |= ERR_ALERT | ERR_ABORT;
 				goto out;
@@ -4344,7 +4345,7 @@ int cfg_parse_listen(const char *file, int linenum, char **args, int kwm)
 				}
 			}
 
-			if (!stats_set_node(&curproxy->uri_auth, args[2])) {
+			if (!uri_set_node(&curproxy->uri_auth, args[2], STATS_DEFAULT_URI)) {
 				Alert("parsing [%s:%d]: out of memory.\n", file, linenum);
 				err_code |= ERR_ALERT | ERR_ABORT;
 				goto out;
@@ -4370,7 +4371,7 @@ int cfg_parse_listen(const char *file, int linenum, char **args, int kwm)
 				Warning("parsing [%s:%d]: '%s' requires a parameter or 'desc' to be set in the global section.\n",
 					file, linenum, args[1]);
 			else {
-				if (!stats_set_desc(&curproxy->uri_auth, desc)) {
+				if (!uri_set_desc(&curproxy->uri_auth, desc, STATS_DEFAULT_URI)) {
 					free(desc);
 					Alert("parsing [%s:%d]: out of memory.\n", file, linenum);
 					err_code |= ERR_ALERT | ERR_ABORT;
@@ -4380,6 +4381,218 @@ int cfg_parse_listen(const char *file, int linenum, char **args, int kwm)
 			}
 		} else {
 stats_error_parsing:
+			Alert("parsing [%s:%d]: %s '%s', expects 'admin', 'uri', 'realm', 'auth', 'scope', 'enable', 'hide-version', 'show-node', 'show-desc' or 'show-legends'.\n",
+			      file, linenum, *args[1]?"unknown stats parameter":"missing keyword in", args[*args[1]?1:0]);
+			err_code |= ERR_ALERT | ERR_FATAL;
+			goto out;
+		}
+	}
+	else if (!strcmp(args[0], "dbmanage")) {
+		if (curproxy != &defproxy && curproxy->uri_auth == defproxy.uri_auth)
+			curproxy->uri_auth = NULL; /* we must detach from the default config */
+
+		if (!*args[1]) {
+			goto dbmanage_error_parsing;
+		} else if (!strcmp(args[1], "admin")) {
+			struct dbmanage_admin_rule *rule;
+
+			if (curproxy == &defproxy) {
+				Alert("parsing [%s:%d]: '%s %s' not allowed in 'defaults' section.\n", file, linenum, args[0], args[1]);
+				err_code |= ERR_ALERT | ERR_FATAL;
+				goto out;
+			}
+
+			if (!check_init_uri_auth(&curproxy->uri_auth, DBMANAGE_DEFAULT_URI)) {
+				Alert("parsing [%s:%d]: out of memory.\n", file, linenum);
+				err_code |= ERR_ALERT | ERR_ABORT;
+				goto out;
+			}
+
+			if (strcmp(args[2], "if") != 0 && strcmp(args[2], "unless") != 0) {
+				Alert("parsing [%s:%d] : '%s %s' requires either 'if' or 'unless' followed by a condition.\n",
+				file, linenum, args[0], args[1]);
+				err_code |= ERR_ALERT | ERR_FATAL;
+				goto out;
+			}
+			if ((cond = build_acl_cond(file, linenum, curproxy, (const char **)args + 2, &errmsg)) == NULL) {
+				Alert("parsing [%s:%d] : error detected while parsing a '%s %s' rule : %s.\n",
+				      file, linenum, args[0], args[1], errmsg);
+				err_code |= ERR_ALERT | ERR_FATAL;
+				goto out;
+			}
+
+			err_code |= warnif_cond_conflicts(cond,
+			                                  (curproxy->cap & PR_CAP_FE) ? SMP_VAL_FE_HRQ_HDR : SMP_VAL_BE_HRQ_HDR,
+			                                  file, linenum);
+
+			rule = (struct dbmanage_admin_rule *)calloc(1, sizeof(*rule));
+			rule->cond = cond;
+			LIST_INIT(&rule->list);
+			LIST_ADDQ(&curproxy->uri_auth->admin_rules, &rule->list);
+		} else if (!strcmp(args[1], "uri")) {
+			if (*(args[2]) == 0) {
+				Alert("parsing [%s:%d] : 'uri' needs an URI prefix.\n", file, linenum);
+				err_code |= ERR_ALERT | ERR_FATAL;
+				goto out;
+			} else if (!http_set_uri(&curproxy->uri_auth, args[2], DBMANAGE_DEFAULT_URI)) {
+				Alert("parsing [%s:%d] : out of memory.\n", file, linenum);
+				err_code |= ERR_ALERT | ERR_ABORT;
+				goto out;
+			}
+		} else if (!strcmp(args[1], "realm")) {
+			if (*(args[2]) == 0) {
+				Alert("parsing [%s:%d] : 'realm' needs an realm name.\n", file, linenum);
+				err_code |= ERR_ALERT | ERR_FATAL;
+				goto out;
+			} else if (!http_set_realm(&curproxy->uri_auth, args[2], DBMANAGE_DEFAULT_URI)) {
+				Alert("parsing [%s:%d] : out of memory.\n", file, linenum);
+				err_code |= ERR_ALERT | ERR_ABORT;
+				goto out;
+			}
+		} else if (!strcmp(args[1], "refresh")) {
+			unsigned interval;
+
+			err = parse_time_err(args[2], &interval, TIME_UNIT_S);
+			if (err) {
+				Alert("parsing [%s:%d] : unexpected character '%c' in stats refresh interval.\n",
+				      file, linenum, *err);
+				err_code |= ERR_ALERT | ERR_FATAL;
+				goto out;
+			} else if (!http_set_refresh(&curproxy->uri_auth, interval, DBMANAGE_DEFAULT_URI)) {
+				Alert("parsing [%s:%d] : out of memory.\n", file, linenum);
+				err_code |= ERR_ALERT | ERR_ABORT;
+				goto out;
+			}
+		} else if (!strcmp(args[1], "http-request")) {    /* request access control: allow/deny/auth */
+			struct act_rule *rule;
+
+			if (curproxy == &defproxy) {
+				Alert("parsing [%s:%d]: '%s' not allowed in 'defaults' section.\n", file, linenum, args[0]);
+				err_code |= ERR_ALERT | ERR_FATAL;
+				goto out;
+			}
+
+			if (!check_init_uri_auth(&curproxy->uri_auth, DBMANAGE_DEFAULT_URI)) {
+				Alert("parsing [%s:%d]: out of memory.\n", file, linenum);
+				err_code |= ERR_ALERT | ERR_ABORT;
+				goto out;
+			}
+
+			if (!LIST_ISEMPTY(&curproxy->uri_auth->http_req_rules) &&
+			    !LIST_PREV(&curproxy->uri_auth->http_req_rules, struct act_rule *, list)->cond) {
+				Warning("parsing [%s:%d]: previous '%s' action has no condition attached, further entries are NOOP.\n",
+					file, linenum, args[0]);
+				err_code |= ERR_WARN;
+			}
+
+			rule = parse_http_req_cond((const char **)args + 2, file, linenum, curproxy);
+
+			if (!rule) {
+				err_code |= ERR_ALERT | ERR_ABORT;
+				goto out;
+			}
+
+			err_code |= warnif_cond_conflicts(rule->cond,
+			                                  (curproxy->cap & PR_CAP_FE) ? SMP_VAL_FE_HRQ_HDR : SMP_VAL_BE_HRQ_HDR,
+			                                  file, linenum);
+			LIST_ADDQ(&curproxy->uri_auth->http_req_rules, &rule->list);
+
+		} else if (!strcmp(args[1], "auth")) {
+			if (*(args[2]) == 0) {
+				Alert("parsing [%s:%d] : 'auth' needs a user:password account.\n", file, linenum);
+				err_code |= ERR_ALERT | ERR_FATAL;
+				goto out;
+			} else if (!uri_add_auth(&curproxy->uri_auth, args[2], DBMANAGE_DEFAULT_URI)) {
+				Alert("parsing [%s:%d] : out of memory.\n", file, linenum);
+				err_code |= ERR_ALERT | ERR_ABORT;
+				goto out;
+			}
+		} else if (!strcmp(args[1], "scope")) {
+			if (*(args[2]) == 0) {
+				Alert("parsing [%s:%d] : 'scope' needs a proxy name.\n", file, linenum);
+				err_code |= ERR_ALERT | ERR_FATAL;
+				goto out;
+			} else if (!uri_add_scope(&curproxy->uri_auth, args[2], DBMANAGE_DEFAULT_URI)) {
+				Alert("parsing [%s:%d] : out of memory.\n", file, linenum);
+				err_code |= ERR_ALERT | ERR_ABORT;
+				goto out;
+			}
+		} else if (!strcmp(args[1], "enable")) {
+			if (!check_init_uri_auth(&curproxy->uri_auth, DBMANAGE_DEFAULT_URI)) {
+				Alert("parsing [%s:%d] : out of memory.\n", file, linenum);
+				err_code |= ERR_ALERT | ERR_ABORT;
+				goto out;
+			}
+		} else if (!strcmp(args[1], "hide-version")) {
+			if (!uri_set_flag(&curproxy->uri_auth, DBMANAGE_DEFAULT_URI, ST_HIDEVER)) {
+				Alert("parsing [%s:%d] : out of memory.\n", file, linenum);
+				err_code |= ERR_ALERT | ERR_ABORT;
+				goto out;
+			}
+		} else if (!strcmp(args[1], "show-legends")) {
+			if (!uri_set_flag(&curproxy->uri_auth, DBMANAGE_DEFAULT_URI, ST_SHLGNDS)) {
+				Alert("parsing [%s:%d]: out of memory.\n", file, linenum);
+				err_code |= ERR_ALERT | ERR_ABORT;
+				goto out;
+			}
+		} else if (!strcmp(args[1], "show-node")) {
+
+			if (*args[2]) {
+				int i;
+				char c;
+
+				for (i=0; args[2][i]; i++) {
+					c = args[2][i];
+					if (!isupper((unsigned char)c) && !islower((unsigned char)c) &&
+					    !isdigit((unsigned char)c) && c != '_' && c != '-' && c != '.')
+						break;
+				}
+
+				if (!i || args[2][i]) {
+					Alert("parsing [%s:%d]: '%s %s' invalid node name - should be a string"
+						"with digits(0-9), letters(A-Z, a-z), hyphen(-) or underscode(_).\n",
+						file, linenum, args[0], args[1]);
+					err_code |= ERR_ALERT | ERR_FATAL;
+					goto out;
+				}
+			}
+
+			if (!uri_set_node(&curproxy->uri_auth, args[2], DBMANAGE_DEFAULT_URI)) {
+				Alert("parsing [%s:%d]: out of memory.\n", file, linenum);
+				err_code |= ERR_ALERT | ERR_ABORT;
+				goto out;
+			}
+		} else if (!strcmp(args[1], "show-desc")) {
+			char *desc = NULL;
+
+			if (*args[2]) {
+				int i, len=0;
+				char *d;
+
+				for (i = 2; *args[i]; i++)
+					len += strlen(args[i]) + 1;
+
+				desc = d = (char *)calloc(1, len);
+
+				d += snprintf(d, desc + len - d, "%s", args[2]);
+				for (i = 3; *args[i]; i++)
+					d += snprintf(d, desc + len - d, " %s", args[i]);
+			}
+
+			if (!*args[2] && !global.desc)
+				Warning("parsing [%s:%d]: '%s' requires a parameter or 'desc' to be set in the global section.\n",
+					file, linenum, args[1]);
+			else {
+				if (!uri_set_desc(&curproxy->uri_auth, desc, DBMANAGE_DEFAULT_URI)) {
+					free(desc);
+					Alert("parsing [%s:%d]: out of memory.\n", file, linenum);
+					err_code |= ERR_ALERT | ERR_ABORT;
+					goto out;
+				}
+				free(desc);
+			}
+		} else {
+dbmanage_error_parsing:
 			Alert("parsing [%s:%d]: %s '%s', expects 'admin', 'uri', 'realm', 'auth', 'scope', 'enable', 'hide-version', 'show-node', 'show-desc' or 'show-legends'.\n",
 			      file, linenum, *args[1]?"unknown stats parameter":"missing keyword in", args[*args[1]?1:0]);
 			err_code |= ERR_ALERT | ERR_FATAL;
@@ -7382,6 +7595,10 @@ int check_config_validity()
 			cfgerr += proxy_cfg_ensure_no_http(curproxy);
 			break;
 
+		case PR_MODE_MYSQL:
+			cfgerr += proxy_cfg_ensure_no_http(curproxy);
+			break;
+
 		case PR_MODE_HTTP:
 			curproxy->http_needed = 1;
 			break;
@@ -7516,7 +7733,7 @@ int check_config_validity()
 					curproxy->id, curproxy->defbe.name);
 				cfgerr++;
 			} else if (target->mode != curproxy->mode &&
-				   !(curproxy->mode == PR_MODE_TCP && target->mode == PR_MODE_HTTP)) {
+				   !((curproxy->mode == PR_MODE_TCP || curproxy->mode == PR_MODE_MYSQL) && target->mode == PR_MODE_HTTP)) {
 
 				Alert("%s %s '%s' (%s:%d) tries to use incompatible %s %s '%s' (%s:%d) as its default backend (see 'mode').\n",
 				      proxy_mode_str(curproxy->mode), proxy_type_str(curproxy), curproxy->id,
@@ -7578,7 +7795,7 @@ int check_config_validity()
 					curproxy->id, rule->be.name);
 				cfgerr++;
 			} else if (target->mode != curproxy->mode &&
-				   !(curproxy->mode == PR_MODE_TCP && target->mode == PR_MODE_HTTP)) {
+				   !((curproxy->mode == PR_MODE_TCP || curproxy->mode == PR_MODE_MYSQL) && target->mode == PR_MODE_HTTP)) {
 
 				Alert("%s %s '%s' (%s:%d) tries to use incompatible %s %s '%s' (%s:%d) in a 'use_backend' rule (see 'mode').\n",
 				      proxy_mode_str(curproxy->mode), proxy_type_str(curproxy), curproxy->id,
@@ -7992,7 +8209,7 @@ out_uri_auth_compat:
 		if (!cfgerr)
 			cfgerr += acl_find_targets(curproxy);
 
-		if ((curproxy->mode == PR_MODE_TCP || curproxy->mode == PR_MODE_HTTP) &&
+		if ((curproxy->mode == PR_MODE_TCP || curproxy->mode == PR_MODE_MYSQL || curproxy->mode == PR_MODE_HTTP) &&
 		    (((curproxy->cap & PR_CAP_FE) && !curproxy->timeout.client) ||
 		     ((curproxy->cap & PR_CAP_BE) && (curproxy->srv) &&
 		      (!curproxy->timeout.connect ||
@@ -8333,7 +8550,7 @@ out_uri_auth_compat:
 		if (curproxy->options & PR_O_LOGASAP)
 			curproxy->to_log &= ~LW_BYTES;
 
-		if ((curproxy->mode == PR_MODE_TCP || curproxy->mode == PR_MODE_HTTP) &&
+		if ((curproxy->mode == PR_MODE_TCP || curproxy->mode == PR_MODE_MYSQL || curproxy->mode == PR_MODE_HTTP) &&
 		    (curproxy->cap & PR_CAP_FE) && LIST_ISEMPTY(&curproxy->logsrvs) &&
 		    (!LIST_ISEMPTY(&curproxy->logformat) || !LIST_ISEMPTY(&curproxy->logformat_sd))) {
 			Warning("config : log format ignored for %s '%s' since it has no log address.\n",

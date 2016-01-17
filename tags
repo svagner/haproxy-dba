@@ -228,7 +228,7 @@ BYTE	./src/xxhash.c	/^typedef unsigned char      BYTE;$/;"	t	file:
 BYTES_SENT_FIELD	./contrib/halog/halog.c	/^#define BYTES_SENT_FIELD /;"	d	file:
 CALLOC	./include/common/config.h	/^#define CALLOC	/;"	d
 CAPTURE_LEN	./include/common/defaults.h	/^#define CAPTURE_LEN /;"	d
-CC	./Makefile	/^CC = gcc$/;"	m
+CC	./Makefile	/^CC = clang$/;"	m
 CC	./contrib/halog/Makefile	/^CC       = gcc$/;"	m
 CC	./contrib/ip6range/Makefile	/^CC       = gcc$/;"	m
 CC	./contrib/iprange/Makefile	/^CC       = gcc$/;"	m
@@ -384,6 +384,7 @@ CT_EXTENSION_TYPE	./src/ssl_sock.c	/^#define CT_EXTENSION_TYPE /;"	d	file:
 DAY	./include/common/standard.h	/^#define DAY /;"	d
 DA_COOKIENAME_DEFAULT	./src/da.c	/^#define	DA_COOKIENAME_DEFAULT	/;"	d	file:
 DA_MAX_HEADERS	./src/da.c	/^#define DA_MAX_HEADERS /;"	d	file:
+DBMANAGE_DEFAULT_URI	./include/common/uri_auth.h	/^#define DBMANAGE_DEFAULT_URI /;"	d
 DEBUG	./Makefile	/^DEBUG =$/;"	m
 DEBUG_CFLAGS	./Makefile	/^  DEBUG_CFLAGS    =$/;"	m
 DEBUG_CFLAGS	./Makefile	/^DEBUG_CFLAGS = -g$/;"	m
@@ -2828,6 +2829,7 @@ check_command	./include/types/proxy.h	/^	char *check_command;			\/* Command to u
 check_config_validity	./src/cfgparse.c	/^int check_config_validity()$/;"	f
 check_conn_cb	./src/checks.c	/^struct data_cb check_conn_cb = {$/;"	v	typeref:struct:data_cb
 check_group	./src/auth.c	/^int check_group(struct userlist *ul, char *name)$/;"	f
+check_init_uri_auth	./src/uri_auth.c	/^struct uri_auth *check_init_uri_auth(struct uri_auth **root, char *default_uri)$/;"	f
 check_len	./include/types/proxy.h	/^	int check_len;				\/* Length of the HTTP or SSL3 request *\/$/;"	m	struct:proxy
 check_lua_lib	./Makefile	/^check_lua_lib = $(shell echo "int main(){}" | $(CC) -o \/dev\/null -x c - $(2) -l$(1) 2>\/dev\/null && echo $(1))$/;"	m
 check_notify_failure	./src/checks.c	/^static void check_notify_failure(struct check *check)$/;"	f	file:
@@ -2935,6 +2937,7 @@ comp_type	./include/types/compression.h	/^struct comp_type {$/;"	s
 compress_min_idle	./src/compression.c	/^unsigned int compress_min_idle = 0;$/;"	v
 cond	./include/common/mini-clist.h	/^	void *cond;$/;"	m	struct:cond_wordlist
 cond	./include/common/regex.h	/^    void *cond;				\/* a possible condition or NULL *\/$/;"	m	struct:hdr_exp
+cond	./include/common/uri_auth.h	/^	struct acl_cond *cond;	\/* acl condition to meet *\/$/;"	m	struct:dbmanage_admin_rule	typeref:struct:dbmanage_admin_rule::acl_cond
 cond	./include/common/uri_auth.h	/^	struct acl_cond *cond;	\/* acl condition to meet *\/$/;"	m	struct:stats_admin_rule	typeref:struct:stats_admin_rule::acl_cond
 cond	./include/types/action.h	/^	struct acl_cond *cond;                 \/* acl condition to meet *\/$/;"	m	struct:act_rule	typeref:struct:act_rule::acl_cond
 cond	./include/types/proxy.h	/^	struct acl_cond *cond;			\/* acl condition to meet *\/$/;"	m	struct:persist_rule	typeref:struct:persist_rule::acl_cond
@@ -3179,6 +3182,7 @@ data_size	./include/types/stick_table.h	/^	int data_size;            \/* the siz
 data_type	./include/types/applet.h	/^			signed char data_type;	\/* type of data to compare, or -1 if none *\/$/;"	m	struct:appctx::__anon21::__anon25
 date	./src/time.c	/^struct timeval date;            \/* the real current date *\/$/;"	v	typeref:struct:timeval
 date2str_log	./src/standard.c	/^char *date2str_log(char *dst, struct tm *tm, struct timeval *date, size_t size)$/;"	f
+dbmanage_admin_rule	./include/common/uri_auth.h	/^struct dbmanage_admin_rule {$/;"	s
 debug_hdr	./src/proto_http.c	/^void debug_hdr(const char *dir, struct stream *s, const char *start, const char *end)$/;"	f
 default_acl_list	./src/acl.c	/^} default_acl_list[] = {$/;"	v	typeref:struct:__anon133
 default_ctx	./include/types/listener.h	/^	SSL_CTX *default_ctx;      \/* SSL context of first\/default certificate *\/$/;"	m	struct:bind_conf
@@ -4184,7 +4188,10 @@ http_return_srv_error	./src/proto_http.c	/^void http_return_srv_error(struct str
 http_scheme	./include/common/standard.h	/^enum http_scheme {$/;"	g
 http_send_name_header	./src/proto_http.c	/^int http_send_name_header(struct http_txn *txn, struct proxy* be, const char* srv_name) {$/;"	f
 http_server_error	./src/proto_http.c	/^static void http_server_error(struct stream *s, struct stream_interface *si,$/;"	f	file:
+http_set_realm	./src/uri_auth.c	/^struct uri_auth *http_set_realm(struct uri_auth **root, char *realm, char *default_uri)$/;"	f
+http_set_refresh	./src/uri_auth.c	/^struct uri_auth *http_set_refresh(struct uri_auth **root, int interval, char *default_uri)$/;"	f
 http_set_status	./src/proto_http.c	/^void http_set_status(unsigned int status, struct stream *s)$/;"	f
+http_set_uri	./src/uri_auth.c	/^struct uri_auth *http_set_uri(struct uri_auth **root, char *uri,char *default_uri)$/;"	f
 http_skip_chunk_crlf	./src/proto_http.c	/^static inline int http_skip_chunk_crlf(struct http_msg *msg)$/;"	f	file:
 http_stats_applet	./src/dumpstats.c	/^struct applet http_stats_applet = {$/;"	v	typeref:struct:applet
 http_stats_io_handler	./src/dumpstats.c	/^static void http_stats_io_handler(struct appctx *appctx)$/;"	f	file:
@@ -4459,6 +4466,7 @@ list	./include/common/memory.h	/^	struct list list;	\/* list of all known pools 
 list	./include/common/mini-clist.h	/^	struct list list;$/;"	m	struct:cond_wordlist	typeref:struct:cond_wordlist::list
 list	./include/common/mini-clist.h	/^	struct list list;$/;"	m	struct:wordlist	typeref:struct:wordlist::list
 list	./include/common/mini-clist.h	/^struct list {$/;"	s
+list	./include/common/uri_auth.h	/^	struct list list;	\/* list linked to from the proxy *\/$/;"	m	struct:dbmanage_admin_rule	typeref:struct:dbmanage_admin_rule::list
 list	./include/common/uri_auth.h	/^	struct list list;	\/* list linked to from the proxy *\/$/;"	m	struct:stats_admin_rule	typeref:struct:stats_admin_rule::list
 list	./include/import/lru.h	/^	struct lru64_list list;$/;"	m	struct:lru64_head	typeref:struct:lru64_head::lru64_list
 list	./include/types/acl.h	/^	struct list list;             \/* chaining *\/$/;"	m	struct:acl_expr	typeref:struct:acl_expr::list
@@ -4786,8 +4794,8 @@ netns_init	./src/namespace.c	/^int netns_init(void)$/;"	f
 netns_store_insert	./src/namespace.c	/^struct netns_entry* netns_store_insert(const char *ns_name)$/;"	f
 netns_store_lookup	./src/namespace.c	/^const struct netns_entry* netns_store_lookup(const char *ns_name, size_t ns_name_len)$/;"	f
 next	./include/common/regex.h	/^    struct hdr_exp *next;$/;"	m	struct:hdr_exp	typeref:struct:hdr_exp::hdr_exp
-next	./include/common/uri_auth.h	/^	struct stat_scope *next;	\/* next entry, NULL if none *\/$/;"	m	struct:stat_scope	typeref:struct:stat_scope::stat_scope
 next	./include/common/uri_auth.h	/^	struct uri_auth *next;		\/* Used at deinit() to build a list of unique elements *\/$/;"	m	struct:uri_auth	typeref:struct:uri_auth::uri_auth
+next	./include/common/uri_auth.h	/^	struct uri_scope *next;	\/* next entry, NULL if none *\/$/;"	m	struct:uri_scope	typeref:struct:uri_scope::uri_scope
 next	./include/types/auth.h	/^	struct auth_groups *next;$/;"	m	struct:auth_groups	typeref:struct:auth_groups::auth_groups
 next	./include/types/auth.h	/^	struct auth_groups_list *next;$/;"	m	struct:auth_groups_list	typeref:struct:auth_groups_list::auth_groups_list
 next	./include/types/auth.h	/^	struct auth_users *next;$/;"	m	struct:auth_users	typeref:struct:auth_users::auth_users
@@ -5257,8 +5265,8 @@ put_srv	./tests/filltab25.c	/^void put_srv(struct srv *s) {$/;"	f
 px	./include/types/applet.h	/^			struct proxy *px;	\/* current proxy being dumped, NULL = not started yet. *\/$/;"	m	struct:appctx::__anon21::__anon24	typeref:struct:appctx::__anon21::__anon24::proxy
 px	./include/types/applet.h	/^			struct proxy *px;$/;"	m	struct:appctx::__anon21::__anon22	typeref:struct:appctx::__anon21::__anon22::proxy
 px	./include/types/sample.h	/^	struct proxy *px;$/;"	m	struct:sample	typeref:struct:sample::proxy
-px_id	./include/common/uri_auth.h	/^	char *px_id;			\/* proxy id *\/$/;"	m	struct:stat_scope
-px_len	./include/common/uri_auth.h	/^	int px_len;			\/* proxy name length *\/$/;"	m	struct:stat_scope
+px_id	./include/common/uri_auth.h	/^	char *px_id;			\/* proxy id *\/$/;"	m	struct:uri_scope
+px_len	./include/common/uri_auth.h	/^	int px_len;			\/* proxy name length *\/$/;"	m	struct:uri_scope
 px_st	./include/types/applet.h	/^			int px_st;		\/* STAT_PX_ST* *\/$/;"	m	struct:appctx::__anon21::__anon22
 pxcounters	./include/types/counters.h	/^struct pxcounters {$/;"	s
 pygments_style	./doc/lua-api/conf.py	/^pygments_style = 'sphinx'$/;"	v
@@ -5572,7 +5580,7 @@ sax_hash	./tests/test_hashes.c	/^unsigned sax_hash ( void *key, int len )$/;"	f
 sc	./include/types/action.h	/^			int sc;$/;"	m	struct:act_rule::__anon9::__anon18
 sc	./include/types/action.h	/^			int sc;$/;"	m	struct:act_rule::__anon9::__anon19
 scheme	./include/common/standard.h	/^	enum http_scheme scheme;$/;"	m	struct:split_url	typeref:enum:split_url::http_scheme
-scope	./include/common/uri_auth.h	/^	struct stat_scope *scope;	\/* linked list of authorized proxies *\/$/;"	m	struct:uri_auth	typeref:struct:uri_auth::stat_scope
+scope	./include/common/uri_auth.h	/^	struct uri_scope *scope;	\/* linked list of authorized proxies *\/$/;"	m	struct:uri_auth	typeref:struct:uri_auth::uri_scope
 scope	./include/types/action.h	/^			enum vars_scope scope;$/;"	m	struct:act_rule::__anon9::__anon17	typeref:enum:act_rule::__anon9::__anon17::vars_scope
 scope	./include/types/listener.h	/^	const char *scope;$/;"	m	struct:bind_kw_list
 scope	./include/types/server.h	/^	const char *scope;$/;"	m	struct:srv_kw_list
@@ -6182,7 +6190,6 @@ start_checks	./src/checks.c	/^int start_checks() {$/;"	f
 start_date	./src/time.c	/^struct timeval start_date;      \/* the process's start date *\/$/;"	v	typeref:struct:timeval
 start_proxies	./src/proxy.c	/^int start_proxies(int verbose)$/;"	f
 start_time	./include/types/hlua.h	/^	unsigned int start_time; \/* The ms time when the Lua starts the last execution. *\/$/;"	m	struct:hlua
-stat_scope	./include/common/uri_auth.h	/^struct stat_scope {$/;"	s
 stat_status_codes	./src/proto_http.c	/^const char *stat_status_codes[STAT_STATUS_SIZE] = {$/;"	v
 state	./include/types/checks.h	/^	int state;				\/* state of the check : CHK_ST_*   *\/$/;"	m	struct:check
 state	./include/types/fd.h	/^	unsigned char state;                 \/* FD state for read and write directions (2*3 bits) *\/$/;"	m	struct:fdtab
@@ -6198,10 +6205,7 @@ static_hdr_ctx	./src/proto_http.c	/^static struct hdr_ctx static_hdr_ctx;$/;"	v	
 static_pattern	./src/pattern.c	/^static struct pattern static_pattern;$/;"	v	typeref:struct:pattern	file:
 static_table_key	./src/stick_table.c	/^struct stktable_key *static_table_key;$/;"	v	typeref:struct:stktable_key
 stats	./include/types/applet.h	/^		} stats;$/;"	m	union:appctx::__anon21	typeref:struct:appctx::__anon21::__anon22
-stats_add_auth	./src/uri_auth.c	/^struct uri_auth *stats_add_auth(struct uri_auth **root, char *user)$/;"	f
-stats_add_scope	./src/uri_auth.c	/^struct uri_auth *stats_add_scope(struct uri_auth **root, char *scope)$/;"	f
 stats_admin_rule	./include/common/uri_auth.h	/^struct stats_admin_rule {$/;"	s
-stats_check_init_uri_auth	./src/uri_auth.c	/^struct uri_auth *stats_check_init_uri_auth(struct uri_auth **root)$/;"	f
 stats_check_uri	./src/proto_http.c	/^int stats_check_uri(struct stream_interface *si, struct http_txn *txn, struct proxy *backend)$/;"	f
 stats_dump_backend_to_buffer	./src/dumpstats.c	/^static int stats_dump_backend_to_buffer(struct stream_interface *si)$/;"	f	file:
 stats_dump_be_stats	./src/dumpstats.c	/^static int stats_dump_be_stats(struct stream_interface *si, struct proxy *px, int flags)$/;"	f	file:
@@ -6234,12 +6238,6 @@ stats_permission_denied_msg	./src/dumpstats.c	/^static const char stats_permissi
 stats_process_http_post	./src/dumpstats.c	/^static int stats_process_http_post(struct stream_interface *si)$/;"	f	file:
 stats_send_http_headers	./src/dumpstats.c	/^static int stats_send_http_headers(struct stream_interface *si)$/;"	f	file:
 stats_send_http_redirect	./src/dumpstats.c	/^static int stats_send_http_redirect(struct stream_interface *si)$/;"	f	file:
-stats_set_desc	./src/uri_auth.c	/^struct uri_auth *stats_set_desc(struct uri_auth **root, char *desc)$/;"	f
-stats_set_flag	./src/uri_auth.c	/^struct uri_auth *stats_set_flag(struct uri_auth **root, int flag)$/;"	f
-stats_set_node	./src/uri_auth.c	/^struct uri_auth *stats_set_node(struct uri_auth **root, char *name)$/;"	f
-stats_set_realm	./src/uri_auth.c	/^struct uri_auth *stats_set_realm(struct uri_auth **root, char *realm)$/;"	f
-stats_set_refresh	./src/uri_auth.c	/^struct uri_auth *stats_set_refresh(struct uri_auth **root, int interval)$/;"	f
-stats_set_uri	./src/uri_auth.c	/^struct uri_auth *stats_set_uri(struct uri_auth **root, char *uri)$/;"	f
 stats_sock_parse_request	./src/dumpstats.c	/^static int stats_sock_parse_request(struct stream_interface *si, char *line)$/;"	f	file:
 stats_sock_table_data_request	./src/dumpstats.c	/^static void stats_sock_table_data_request(struct stream_interface *si, char **args, int action)$/;"	f	file:
 stats_sock_table_key_request	./src/dumpstats.c	/^static void stats_sock_table_key_request(struct stream_interface *si, char **args, int action)$/;"	f	file:
@@ -6707,12 +6705,18 @@ updated	./include/types/fd.h	/^	unsigned char updated:1;             \/* 1 if th
 updates	./include/types/stick_table.h	/^	struct eb_root updates;   \/* head of sticky updates sequence tree *\/$/;"	m	struct:stktable	typeref:struct:stktable::eb_root
 updt_fd_polling	./include/proto/fd.h	/^static inline void updt_fd_polling(const int fd)$/;"	f
 uri	./include/types/proto_http.h	/^	char *uri;                      \/* first line if log needed, NULL otherwise *\/$/;"	m	struct:http_txn
+uri_add_auth	./src/uri_auth.c	/^struct uri_auth *uri_add_auth(struct uri_auth **root, char *user, char *default_uri)$/;"	f
+uri_add_scope	./src/uri_auth.c	/^struct uri_auth *uri_add_scope(struct uri_auth **root, char *scope, char *default_uri)$/;"	f
 uri_auth	./include/common/uri_auth.h	/^struct uri_auth {$/;"	s
 uri_auth	./include/types/proxy.h	/^	struct uri_auth *uri_auth;		\/* if non-NULL, the (list of) per-URI authentications *\/$/;"	m	struct:proxy	typeref:struct:proxy::uri_auth
 uri_dirs_depth1	./include/types/proxy.h	/^	int  uri_dirs_depth1;			\/* directories+1 (slashes) limit for uri balancing algorithm *\/$/;"	m	struct:proxy
 uri_len	./include/common/uri_auth.h	/^	int uri_len;			\/* the prefix length *\/$/;"	m	struct:uri_auth
 uri_len_limit	./include/types/proxy.h	/^	int  uri_len_limit;			\/* character limit for uri balancing algorithm *\/$/;"	m	struct:proxy
 uri_prefix	./include/common/uri_auth.h	/^	char *uri_prefix;		\/* the prefix we want to match *\/$/;"	m	struct:uri_auth
+uri_scope	./include/common/uri_auth.h	/^struct uri_scope {$/;"	s
+uri_set_desc	./src/uri_auth.c	/^struct uri_auth *uri_set_desc(struct uri_auth **root, char *desc, char *default_uri)$/;"	f
+uri_set_flag	./src/uri_auth.c	/^struct uri_auth *uri_set_flag(struct uri_auth **root, char *default_uri, int flag)$/;"	f
+uri_set_node	./src/uri_auth.c	/^struct uri_auth *uri_set_node(struct uri_auth **root, char *name, char *default_uri)$/;"	f
 uri_whole	./include/types/proxy.h	/^	int  uri_whole;				\/* if != 0, calculates the hash from the whole uri. Still honors the len_limit and dirs_depth1 *\/$/;"	m	struct:proxy
 url	./contrib/halog/halog.c	/^		struct ebpt_node url;$/;"	m	union:url_stat::__anon1	typeref:struct:url_stat::__anon1::ebpt_node	file:
 url	./contrib/halog/halog.c	/^	char *url;$/;"	m	struct:url_stat	file:

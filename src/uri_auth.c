@@ -23,7 +23,7 @@
  * Initializes a basic uri_auth structure header and returns a pointer to it.
  * Uses the pointer provided if not NULL and not initialized.
  */
-struct uri_auth *stats_check_init_uri_auth(struct uri_auth **root)
+struct uri_auth *check_init_uri_auth(struct uri_auth **root, char *default_uri)
 {
 	struct uri_auth *u;
 
@@ -37,8 +37,8 @@ struct uri_auth *stats_check_init_uri_auth(struct uri_auth **root)
 		u = *root;
 
 	if (!u->uri_prefix) {
-		u->uri_len = strlen(STATS_DEFAULT_URI);
-		if ((u->uri_prefix = strdup(STATS_DEFAULT_URI)) == NULL)
+		u->uri_len = strlen(default_uri);
+		if ((u->uri_prefix = strdup(default_uri)) == NULL)
 			goto out_uri;
 	}
 
@@ -58,7 +58,7 @@ struct uri_auth *stats_check_init_uri_auth(struct uri_auth **root)
  * Returns a default uri_auth with <uri> set as the uri_prefix.
  * Uses the pointer provided if not NULL and not initialized.
  */
-struct uri_auth *stats_set_uri(struct uri_auth **root, char *uri)
+struct uri_auth *http_set_uri(struct uri_auth **root, char *uri,char *default_uri)
 {
 	struct uri_auth *u;
 	char *uri_copy;
@@ -68,7 +68,7 @@ struct uri_auth *stats_set_uri(struct uri_auth **root, char *uri)
 	if ((uri_copy = strdup(uri)) == NULL)
 		goto out_uri;
 	
-	if ((u = stats_check_init_uri_auth(root)) == NULL)
+	if ((u = check_init_uri_auth(root, default_uri)) == NULL)
 		goto out_u;
 	
 	free(u->uri_prefix);
@@ -86,7 +86,7 @@ struct uri_auth *stats_set_uri(struct uri_auth **root, char *uri)
  * Returns a default uri_auth with <realm> set as the realm.
  * Uses the pointer provided if not NULL and not initialized.
  */
-struct uri_auth *stats_set_realm(struct uri_auth **root, char *realm)
+struct uri_auth *http_set_realm(struct uri_auth **root, char *realm, char *default_uri)
 {
 	struct uri_auth *u;
 	char *realm_copy;
@@ -94,7 +94,7 @@ struct uri_auth *stats_set_realm(struct uri_auth **root, char *realm)
 	if ((realm_copy = strdup(realm)) == NULL)
 		goto out_realm;
 	
-	if ((u = stats_check_init_uri_auth(root)) == NULL)
+	if ((u = check_init_uri_auth(root, default_uri)) == NULL)
 		goto out_u;
 	
 	free(u->auth_realm);
@@ -112,7 +112,7 @@ struct uri_auth *stats_set_realm(struct uri_auth **root, char *realm)
  * <node> set as the name if it is not empty.
  * Uses the pointer provided if not NULL and not initialized.
  */
-struct uri_auth *stats_set_node(struct uri_auth **root, char *name)
+struct uri_auth *uri_set_node(struct uri_auth **root, char *name, char *default_uri)
 {
 	struct uri_auth *u;
 	char *node_copy = NULL;
@@ -123,10 +123,10 @@ struct uri_auth *stats_set_node(struct uri_auth **root, char *name)
 			goto out_realm;
 	}
 	
-	if ((u = stats_check_init_uri_auth(root)) == NULL)
+	if ((u = check_init_uri_auth(root, default_uri)) == NULL)
 		goto out_u;
 
-	if (!stats_set_flag(root, ST_SHNODE))
+	if (!uri_set_flag(root, default_uri, ST_SHNODE))
 		goto out_u;
 
 	if (node_copy) {	
@@ -147,7 +147,7 @@ struct uri_auth *stats_set_node(struct uri_auth **root, char *name)
  * <description> set as the desc if it is not empty.
  * Uses the pointer provided if not NULL and not initialized.
  */
-struct uri_auth *stats_set_desc(struct uri_auth **root, char *desc)
+struct uri_auth *uri_set_desc(struct uri_auth **root, char *desc, char *default_uri)
 {
 	struct uri_auth *u;
 	char *desc_copy = NULL;
@@ -158,10 +158,10 @@ struct uri_auth *stats_set_desc(struct uri_auth **root, char *desc)
 			goto out_realm;
 	}
 	
-	if ((u = stats_check_init_uri_auth(root)) == NULL)
+	if ((u = check_init_uri_auth(root, default_uri)) == NULL)
 		goto out_u;
 
-	if (!stats_set_flag(root, ST_SHDESC))
+	if (!uri_set_flag(root, STATS_DEFAULT_URI, ST_SHDESC))
 		goto out_u;
 
 	if (desc_copy) {
@@ -181,11 +181,11 @@ struct uri_auth *stats_set_desc(struct uri_auth **root, char *desc)
  * Returns a default uri_auth with the <refresh> refresh interval.
  * Uses the pointer provided if not NULL and not initialized.
  */
-struct uri_auth *stats_set_refresh(struct uri_auth **root, int interval)
+struct uri_auth *http_set_refresh(struct uri_auth **root, int interval, char *default_uri)
 {
 	struct uri_auth *u;
 	
-	if ((u = stats_check_init_uri_auth(root)) != NULL)
+	if ((u = check_init_uri_auth(root, default_uri)) != NULL)
 		u->refresh = interval;
 	return u;
 }
@@ -194,11 +194,11 @@ struct uri_auth *stats_set_refresh(struct uri_auth **root, int interval)
  * Returns a default uri_auth with the <flag> set.
  * Uses the pointer provided if not NULL and not initialized.
  */
-struct uri_auth *stats_set_flag(struct uri_auth **root, int flag)
+struct uri_auth *uri_set_flag(struct uri_auth **root, char *default_uri, int flag)
 {
 	struct uri_auth *u;
 	
-	if ((u = stats_check_init_uri_auth(root)) != NULL)
+	if ((u = check_init_uri_auth(root, default_uri)) != NULL)
 		u->flags |= flag;
 	return u;
 }
@@ -208,7 +208,7 @@ struct uri_auth *stats_set_flag(struct uri_auth **root, int flag)
  * authorized users. If a matching entry is found, no update will be performed.
  * Uses the pointer provided if not NULL and not initialized.
  */
-struct uri_auth *stats_add_auth(struct uri_auth **root, char *user)
+struct uri_auth *uri_add_auth(struct uri_auth **root, char *user, char *default_uri)
 {
 	struct uri_auth *u;
 	struct auth_users *newuser;
@@ -220,7 +220,7 @@ struct uri_auth *stats_add_auth(struct uri_auth **root, char *user)
 	else
 		pass = "";
 
-	if ((u = stats_check_init_uri_auth(root)) == NULL)
+	if ((u = check_init_uri_auth(root, default_uri)) == NULL)
 		return NULL;
 
 	if (!u->userlist)
@@ -271,13 +271,13 @@ struct uri_auth *stats_add_auth(struct uri_auth **root, char *user)
  * allowed scopes. If a matching entry is found, no update will be performed.
  * Uses the pointer provided if not NULL and not initialized.
  */
-struct uri_auth *stats_add_scope(struct uri_auth **root, char *scope)
+struct uri_auth *uri_add_scope(struct uri_auth **root, char *scope, char *default_uri)
 {
 	struct uri_auth *u;
 	char *new_name;
-	struct stat_scope *old_scope, **scope_list;
+	struct uri_scope *old_scope, **scope_list;
 
-	if ((u = stats_check_init_uri_auth(root)) == NULL)
+	if ((u = check_init_uri_auth(root, default_uri)) == NULL)
 		goto out;
 
 	scope_list = &u->scope;
@@ -291,7 +291,7 @@ struct uri_auth *stats_add_scope(struct uri_auth **root, char *scope)
 		if ((new_name = strdup(scope)) == NULL)
 			goto out_u;
 
-		if ((old_scope = (struct stat_scope *)calloc(1, sizeof(*old_scope))) == NULL)
+		if ((old_scope = (struct uri_scope *)calloc(1, sizeof(*old_scope))) == NULL)
 			goto out_name;
 
 		old_scope->px_id = new_name;

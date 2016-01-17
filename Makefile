@@ -116,12 +116,12 @@ ARCH =
 
 #### Toolchain options.
 # GCC is normally used both for compiling and linking.
-CC = gcc
+CC = clang
 LD = $(CC)
 
 #### Debug flags (typically "-g").
 # Those flags only feed CFLAGS so it is not mandatory to use this form.
-DEBUG_CFLAGS = -g
+DEBUG_CFLAGS = -ggdb
 
 #### Compiler-specific flags that may be used to disable some negative over-
 # optimization or to silence some warnings. -fno-strict-aliasing is needed with

@@ -46,7 +46,7 @@
 #include <proto/stream_interface.h>
 #include <proto/task.h>
 
-/* Finish a stream accept() for a proxy (TCP or HTTP). It returns a negative
+/* Finish a stream accept() for a proxy (TCP, MYSQL or HTTP). It returns a negative
  * value in case of a critical failure which must cause the listener to be
  * disabled, a positive or null value in case of success.
  */
@@ -81,7 +81,7 @@ int frontend_accept(struct stream *s)
 		http_init_txn(s);
 	}
 
-	if ((fe->mode == PR_MODE_TCP || fe->mode == PR_MODE_HTTP)
+	if ((fe->mode == PR_MODE_TCP || fe->mode == PR_MODE_MYSQL || fe->mode == PR_MODE_HTTP)
 	    && (!LIST_ISEMPTY(&fe->logsrvs))) {
 		if (likely(!LIST_ISEMPTY(&fe->logformat))) {
 			/* we have the client ip */

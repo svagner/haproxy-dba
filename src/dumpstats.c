@@ -4090,7 +4090,7 @@ static int stats_dump_proxy_to_buffer(struct stream_interface *si, struct proxy 
 		/* we are on a new proxy */
 		if (uri && uri->scope) {
 			/* we have a limited scope, we have to check the proxy name */
-			struct stat_scope *scope;
+			struct uri_scope *scope;
 			int len;
 
 			len = strlen(px->id);
